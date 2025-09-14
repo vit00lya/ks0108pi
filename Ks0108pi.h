@@ -1,4 +1,4 @@
-#ifndef __KS0108PI_H_INCLUDED__
+﻿#ifndef __KS0108PI_H_INCLUDED__
 #define __KS0108PI_H_INCLUDED__
 
 #include <bcm2835.h>
@@ -84,6 +84,7 @@ public:
 	void writeString(uint8_t, uint8_t, char *, uint8_t* );
 
 	void shiftBufferHorizontal(int);
+    void drawBitmap(const unsigned char* bitmap);
 };
 
 #endif // __KS0108PI_H_INCLUDED__

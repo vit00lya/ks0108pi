@@ -307,24 +307,26 @@ void Ks0108pi::writeChar(uint8_t x, uint8_t y, char charToWrite, uint8_t* font)
 		fixed_width  = 0;
 	}
 
-
-	if( !fixed_width ){
-		charWidth = font[6+(charToWrite-firstChar)];
-		sum += charCount;
-	}
+    int height_calc = 0;
+    if( !fixed_width ){
+        charWidth = font[6+(charToWrite-firstChar)];
+        sum += charCount;
+        height_calc = ceil(charHeight/8.0);
+    }
 
 	//jumps to the char data position on the array.
 	for(int i=firstChar; i<charToWrite; i++){
 		if( !fixed_width )
-			sum += font[6+i-firstChar] * ceil(charHeight/8.0);
+            sum += font[6+i-firstChar] * height_calc;
 		else
-			sum += charWidth * ceil(charHeight/8.0);
+            sum += charWidth;
 	}
 
+    int width_calc = ceil(charWidth/8.0);
 	for(int line=0; line < charHeight; line+=8){
 		for(int col=0; col<charWidth; col++){
 			setPixels(x+col, ceil(y+line),
-				font[sum + col + (int)ceil(charWidth*line/8.0)]
+                font[sum + col + line * width_calc]
 			);
 		}
 	}
@@ -371,4 +373,28 @@ void Ks0108pi::shiftBufferHorizontal(int x)
 	}
 
 
+}
+
+//-------------------------------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------------------------------
+void Ks0108pi::drawBitmap(const unsigned char* bitmap)
+{
+
+    for (int page = 0; page < 8; page++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            int byte_index = page * SCREEN_WIDTH + x;
+            unsigned char byte = bitmap[byte_index];
+            for (int bit = 0; bit < 8; bit++) {
+                int y = page * 8 + bit;
+                if (y < SCREEN_HEIGHT) {
+                    if ((byte >> bit) & 0x01) {
+                        setPixel(x,y);
+                    } else{
+                        clearPixel(x,y);
+                    }
+                }
+            }
+        }
+    }
 }
